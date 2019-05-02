@@ -319,7 +319,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
                                                                                                                                         
     ;                                                                                                                                   
                                                                                                                                         
-    %macro utl_unlock(class)/des="convert b64 to binary zip file and unzip into work directory";                                        
+    %macro utl_unlock(dsn)/des="convert b64 to binary zip file and unzip into work directory";                                        
                                                                                                                                         
         %let zipPth=%sysfunc(pathname(work));                                                                                           
                                                                                                                                         
@@ -331,7 +331,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
           infile "&zipPth./&dsn..txt" lrecl= 76 truncover length=b64length;                                                             
           input @1 b64 $base64X76.;                                                                                                     
           if _N_=1 then putlog "NOTE: Detected Base64 Line Length of " b64length;                                                       
-          file "&zipPth/&dsn...zip" recfm=F lrecl= 1;                                                                                   
+          file "&zipPth/&dsn..zip" recfm=F lrecl= 1;                                                                                   
           do i=1 to (b64length/4)*3;                                                                                                    
             byte=byte(rank(substr(b64,i, 1)));                                                                                          
             put byte $char1.;                                                                                                           
