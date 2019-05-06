@@ -174,8 +174,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
                        |_|                                                                                                              
     ;                                                                                                                                   
                                                                                                                                         
-                                                                                                                    
-                                                                                                                                        
+                                                                                                        
     %utl_zipit(class);                                                                                                                  
                                                                                                                                         
                                                                                                                                         
@@ -190,9 +189,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
     |_____\____| |_.__/ \__,_|___/\___/   |_|                                                                                           
                                                                                                                                         
     ;                                                                                                                                   
-                                                                                                                                        
-                                                                    
-                                                                                                                                        
+                                                                                                                                    
     %utl_b64(class);                                                                                                                    
                                                                                                                                         
     NOTE: The infile "d:\wrk\_TDxxxxxxxxxxxxx_/class.zip" is:                                                                           
@@ -254,9 +251,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
       \_/\_/ \___/|_|  |_|\_\___/\__\__,_|\__|_|\___/|_| |_|                                                                            
                                                                                                                                         
     ;                                                                                                                                   
-                                                                                                                                        
-                                                                                        
-                                                                                                                                        
+                                                                                                                                      
     %utl_unlock(class);                                                                                                                 
                                                                                                                                         
     NOTE: The infile library INZIP is:                                                                                                  
