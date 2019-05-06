@@ -34,8 +34,12 @@ Boot to network VM setup. IT loves this stuff.
          2. Zip the SAS table                                                                                            
          3. Convert the zip file to base64 and rint the 76 byte base64 records to results                                
          4. Click on export results                                                                                      
-         5. Save to local power workstation (10x productivity platform)                                                  
-                                                                                                                         
+         5. Save to local power workstation (10x productivity platform)  
+         
+for macros utl_zipit, utl_b64 and utl_unlock                                                                                                                                                                                                                                                         
+https://tinyurl.com/y9nfugth                                                                                                                                                                                                                                    
+https://github.com/rogerjdeangelis/utl-macros-used-in-many-of-rogerjdeangelis-repositories                                                                                                                                                                      
+                                                                                                                             
 Many Thanks to Chris Hemedinger and Micheal Dixon                                                                        
                                                                                                                          
 https://support.sas.com/training/instructor/hemedinger_chr.html                                                          
@@ -162,43 +166,7 @@ Obs    NAME       SEX    AGE    HEIGHT    WEIGHT
 |_____\____| /___|_| .__/  |_|\__|                                                                                       
                    |_|                                                                                                   
 ;                                                                                                                        
-                                                                                                                         
-%macro utl_zipit(dsn)/des="zip a single SAS table in work and output table.zip";                                         
-                                                                                                                         
-    %local zipPth;                                                                                                       
-                                                                                                                         
-    %let zipPth=%sysfunc(pathname(work));                                                                                
-                                                                                                                         
-    %utlfkil(&zipPth./test_inp.zip);                                                                                     
-                                                                                                                         
-    filename projzip "&zipPth./&dsn.zip";                                                                                
-                                                                                                                         
-    data _null_;                                                                                                         
-       rc=fdelete("&dsn");                                                                                               
-    run;                                                                                                                 
-                                                                                                                         
-    ods output EngineHost=File;                                                                                          
-      proc contents data=work.&dsn;                                                                                      
-    run;                                                                                                                 
-                                                                                                                         
-    proc sql noprint;                                                                                                    
-       select cValue1 into: outDsName from work.file where Label1="Filename";                                            
-    quit;                                                                                                                
-                                                                                                                         
-    filename data_fn "&zipPth./&dsn..sas7bdat";                                                                          
-                                                                                                                         
-    filename addfile zip "&zipPth./&dsn..zip" member="data/&dsn..sas7bdat";                                              
-                                                                                                                         
-    data _null_;                                                                                                         
-       infile data_fn recfm=n;                                                                                           
-       file addfile recfm=n;                                                                                             
-       input byte $char1. @;                                                                                             
-       put byte $char1. @;                                                                                               
-    run;                                                                                                                 
-                                                                                                                         
-    filename projzip clear;                                                                                              
-                                                                                                                         
-%mend utl_zipit;                                                                                                         
+                                                                                                                                                                                                                 
                                                                                                                          
 %utl_zipit(class);                                                                                                       
                                                                                                                          
@@ -215,41 +183,7 @@ Obs    NAME       SEX    AGE    HEIGHT    WEIGHT
                                                                                                                          
 ;                                                                                                                        
                                                                                                                          
-%macro utl_b64(dsn) / des="input table zip file des=class.zip amd send b64 code to results";                             
-                                                                                                                         
-    %local zipPth;                                                                                                       
-                                                                                                                         
-    %let wrkpth=%sysfunc(pathname(work));                                                                                
-                                                                                                                         
-    options nodate nonumber ps=32756;                                                                                    
-    title;                                                                                                               
-                                                                                                                         
-    data _null_;                                                                                                         
-                                                                                                                         
-      length b64 $ 76 line $ 57;                                                                                         
-                                                                                                                         
-      retain line "";                                                                                                    
-                                                                                                                         
-      infile "&wrkpth/&dsn..zip" recfm=F lrecl= 1 end=eof;                                                               
-                                                                                                                         
-      input @1 stream $char1.;                                                                                           
-                                                                                                                         
-      substr(line,(_N_-(CEIL(_N_/57)-1)*57),1) = byte(rank(stream));                                                     
-                                                                                                                         
-      if mod(_N_,57)=0 or EOF then do;                                                                                   
-                                                                                                                         
-        if eof then b64=put(trim(line),$base64X76.);                                                                     
-        else b64=put(line, $base64X76.);                                                                                 
-        file print;                                                                                                      
-                                                                                                                         
-        put b64;                                                                                                         
-        line="";                                                                                                         
-                                                                                                                         
-      end;                                                                                                               
-    run;quit;                                                                                                            
-                                                                                                                         
-%mend utl_b64;                                                                                                           
-                                                                                                                         
+                                                                                
 %utl_b64(class);                                                                                                         
                                                                                                                          
 NOTE: The infile "d:\wrk\_TDxxxxxxxxxxxxx_/class.zip" is:                                                                
@@ -312,39 +246,7 @@ __      _____  _ __| | _____| |_ __ _| |_(_) ___  _ __
                                                                                                                          
 ;                                                                                                                        
                                                                                                                          
-%macro utl_unlock(dsn)/des="convert b64 to binary zip file and unzip into work directory";                             
-                                                                                                                         
-    %let zipPth=%sysfunc(pathname(work));                                                                                
-                                                                                                                         
-    data _null_;                                                                                                         
-                                                                                                                         
-      length b64 $ 76 byte $ 1;                                                                                          
-                                                                                                                         
-      /* We only deal with Base64 files with a max line length of 76 */                                                  
-      infile "&zipPth./&dsn..txt" lrecl= 76 truncover length=b64length;                                                  
-      input @1 b64 $base64X76.;                                                                                          
-      if _N_=1 then putlog "NOTE: Detected Base64 Line Length of " b64length;                                            
-      file "&zipPth/&dsn..zip" recfm=F lrecl= 1;                                                                        
-      do i=1 to (b64length/4)*3;                                                                                         
-        byte=byte(rank(substr(b64,i, 1)));                                                                               
-        put byte $char1.;                                                                                                
-      end;                                                                                                               
-    run;                                                                                                                 
-                                                                                                                         
-    filename inzip ZIP "&zipPth/&dsn..zip";                                                                              
-    filename mem "&zipPth/&dsn..sas7bdat";                                                                               
-                                                                                                                         
-    data _null_;                                                                                                         
-                                                                                                                         
-      infile inzip("data/&dsn..sas7bdat") lrecl=256 recfm=F length=length unbuf;                                         
-      file mem lrecl=256 recfm=N;                                                                                        
-                                                                                                                         
-      input;                                                                                                             
-      put _infile_ $varying256. length;                                                                                  
-                                                                                                                         
-    run;quit;                                                                                                            
-                                                                                                                         
-%mend utl_unlock;                                                                                                        
+                                                                     
                                                                                                                          
 %utl_unlock(class);                                                                                                      
                                                                                                                          
