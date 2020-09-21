@@ -13,7 +13,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
            1. No interactive base products                                                                                              
            2. No updateable user profile                                                                                                
            3. No drop down to Python, R or Perl                                                                                         
-           4. No folders server of client access to folders (only through mouse surfing                                                 
+           4. No access server folders from client                                                 
            5. Chrome paint your screen and chrome direct boot to VM EG only functionality                                               
            6. No SAS command line                                                                                                       
            7. Classic editor not available (web like editor)                                                                            
