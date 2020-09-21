@@ -38,7 +38,7 @@ Download sas tables while in supermax EG lockdown and solitary confinement
                 (this is the only folder avaliable in supermax lockdown solitary confinment(boot to server VM))                         
                                                                                                                                         
              2. Zip the SAS table                                                                                                       
-             3. Convert the zip file to base64 and rint the 76 byte base64 records to results                                           
+             3. Convert the zip file to base64 and print the 76 byte base64 records to results                                           
              4. Click on export results                                                                                                 
              5. Save to local power workstation (10x productivity platform)  
              
